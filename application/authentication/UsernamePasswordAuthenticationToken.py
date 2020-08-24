@@ -29,7 +29,7 @@ credentials_exception = BaseError(
 
 
 # token验证
-async def verify_token(token: str = Depends(oauth2_scheme)):
+async def verify_token(token: str = Depends(oauth2_scheme)) -> UserData:
     print("token:{}".format(token))
     if 'Bearer' in token:
         token = token.split(' ')[-1]

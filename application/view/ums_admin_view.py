@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, Path, Request, Header, Body
 from application.settings import token_head, error_code, tokenUrl
 from application.schema.ums_admin_schema import UmsAdminInSchema, UmsAdminOutSchema, UmsAdminUpdateSchema, \
-    UpdateAdminPasswordSchema
+    UpdateAdminPasswordSchema, UmsAdminLoginSchema
 from application.model import Session, get_db
 from application.service.ums_admin_service import UmsAdminService
 from application.api.response import BaseError, BaseResponse
@@ -15,7 +15,7 @@ admin_service = UmsAdminService()
 role_service = UmsRoleService()
 
 
-@ums_admin_router.post('/register', description="用户注册")
+@ums_admin_router.post('/register', description="用户注册",summary='注册')
 async def register(schema: UmsAdminInSchema, db: Session = Depends(get_db)):
     ums_admin = await admin_service.register(db=db, schema=schema)
     if ums_admin:
@@ -24,8 +24,8 @@ async def register(schema: UmsAdminInSchema, db: Session = Depends(get_db)):
         raise BaseError(msg="操作失败！")
 
 
-@ums_admin_router.post(tokenUrl, description='用户登录')
-async def login(schema: UmsAdminInSchema, req: Request, db: Session = Depends(get_db)):
+@ums_admin_router.post(tokenUrl, description='用户登录',summary='登录')
+async def login(schema: UmsAdminLoginSchema, req: Request, db: Session = Depends(get_db)):
     token = await admin_service.login(db=db, username=schema.username, password=schema.password, request=req)
     if not token:
         raise BaseError(code=error_code, msg='用户名或密码错误')
@@ -35,7 +35,7 @@ async def login(schema: UmsAdminInSchema, req: Request, db: Session = Depends(ge
     })
 
 
-@ums_admin_router.get('/info', description='获取当前登录用户信息')
+@ums_admin_router.get('/info', summary='获取当前登录用户信息')
 async def get_admin_info(current_user=Depends(get_current_user), db: Session = Depends(get_db)):
     menus = await role_service.get_menu_list(db=db, admin_id=current_user.id)
     roles = await admin_service.get_role_list(db=db, admin_id=current_user.id)
@@ -46,14 +46,14 @@ async def get_admin_info(current_user=Depends(get_current_user), db: Session = D
     return BaseResponse(data=data)
 
 
-@ums_admin_router.post('/logout', description='登出功能')
+@ums_admin_router.post('/logout', summary='登出功能')
 async def logout(current_user=Depends(get_current_user)):
     if not await admin_service.logout(current_user.username, current_user.id):
         raise BaseError(msg='操作失败！')
     return BaseResponse()
 
 
-@ums_admin_router.get('/list', description='根据用户名或姓名分页获取用户列表')
+@ums_admin_router.get('/list', summary='根据用户名或姓名分页获取用户列表')
 async def get_list(page_num: int = Query(1, alias='pageNum'), page_size: int = Query(5, alias='pageSize'),
                    keyword: str = Query(None),
                    user_data=Depends(verify_token), db: Session = Depends(get_db)):
@@ -63,14 +63,14 @@ async def get_list(page_num: int = Query(1, alias='pageNum'), page_size: int = Q
     return BaseResponse(data=users)
 
 
-@ums_admin_router.get('/{id}', description='获取指定用户信息')
+@ums_admin_router.get('/{id}', summary='获取指定用户信息')
 async def get_item(user_id: int = Path(..., alias='id'), user_data=Depends(verify_token),
                    db: Session = Depends(get_db)):
     ums_user = await admin_service.get_admin_by_id(db=db, user_id=user_id)
     return BaseResponse(data=ums_user)
 
 
-@ums_admin_router.post('/update/{id}', description='修改指定用户信息')
+@ums_admin_router.post('/update/{id}', summary='修改指定用户信息')
 async def update_user(user_info: UmsAdminUpdateSchema, user_id: int = Path(..., alias='id'),
                       user_data=Depends(verify_token),
                       db: Session = Depends(get_db)):
@@ -89,7 +89,7 @@ async def update_pwd(pwd_info: UpdateAdminPasswordSchema, current_user=Depends(g
         return BaseError(msg='操作失败!')
 
 
-@ums_admin_router.post('/refreshToken', description='刷新1token功能')
+@ums_admin_router.post('/refreshToken', summary='刷新1token功能')
 async def refresh_token(authorization_token: str = Header(..., alias='Authorization')):
     new_token = await admin_service.refresh_token(token=authorization_token)
     if not new_token:
@@ -101,14 +101,14 @@ async def refresh_token(authorization_token: str = Header(..., alias='Authorizat
         })
 
 
-@ums_admin_router.post('/delete/{id}', description='删除指定用户信息')
+@ums_admin_router.post('/delete/{id}', summary='删除指定用户信息')
 async def delete_ums_admin(user_id: int = Path(..., alias='id'), user_data=Depends(verify_token),
                            db: Session = Depends(get_db)):
     await admin_service.delete(db=db, user_id=user_id)
     return BaseResponse()
 
 
-@ums_admin_router.post('/updateStatus/{id}', description='修改帐号状态')
+@ums_admin_router.post('/updateStatus/{id}', summary='修改帐号状态')
 async def update_status(user_id: int = Path(..., alias='id'), status: int = Query(...),
                         user_data=Depends(verify_token),
                         db: Session = Depends(get_db)):
@@ -117,7 +117,7 @@ async def update_status(user_id: int = Path(..., alias='id'), status: int = Quer
     return BaseResponse()
 
 
-@ums_admin_router.post('/role/update', description='给用户分配角色')
+@ums_admin_router.post('/role/update', summary='给用户分配角色')
 async def update_role(admin_id: int = Query(...), roles: List[int] = Query(...), user_data=Depends(verify_token),
                       db: Session = Depends(get_db)):
     if len(roles) == 0:
@@ -140,7 +140,7 @@ async def update_role(admin_id: int = Query(...), roles: List[int] = Query(...),
 '''
 
 
-@ums_admin_router.get('/role/{adminId}', description='获取指定用户的角色')
+@ums_admin_router.get('/role/{adminId}', summary='获取指定用户的角色')
 async def get_role_list(admin_id: int = Path(..., alias='adminId'), user_data=Depends(verify_token),
                         db: Session = Depends(get_db)):
     roles = await admin_service.get_role_list(db=db, admin_id=admin_id)
@@ -162,7 +162,7 @@ async def get_role_list(admin_id: int = Path(..., alias='adminId'), user_data=De
 '''
 
 
-@ums_admin_router.post('/permission/update', description='给用户分配+-权限')
+@ums_admin_router.post('/permission/update', summary='给用户分配+-权限')
 async def update_permission(admin_id: int = Query(..., alias='adminId'), permission_ids: List[int] = Body(...),
                             user_data=Depends(verify_token),
                             db: Session = Depends(get_db)):
@@ -184,7 +184,7 @@ async def update_permission(admin_id: int = Query(..., alias='adminId'), permiss
 '''
 
 
-@ums_admin_router.get('/permission/{adminId}', description='获取用户所有权限（包括+-权限）')
+@ums_admin_router.get('/permission/{adminId}', summary='获取用户所有权限（包括+-权限）')
 async def get_permissions(admin_id: int = Path(..., alias='adminId'), user_data=Depends(verify_token),
                           db: Session = Depends(get_db)):
     permissions = await admin_service.get_permission_list(db=db, admin_id=admin_id)

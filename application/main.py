@@ -6,14 +6,25 @@ from starlette.requests import Request
 from application.view.ums_admin_view import ums_admin_router
 from application.api.response import BaseError
 from fastapi.responses import JSONResponse
+from application.view.ums_member_level_view import ums_member_router
 
 app = FastAPI(debug=True)
-app.include_router(ums_admin_router)
+app.include_router(ums_admin_router, prefix='/admin')
+app.include_router(ums_member_router, prefix='/memberLevel')
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 #
 # # 创建一个templates（模板）对象，以后可以重用。
 # templates = Jinja2Templates(directory="templates")
+
+'''
+postgres=# drop database mall ;
+DROP DATABASE
+postgres=# create database mall owner zengqi;
+CREATE DATABASE
+postgres=# grant ALL privileges on database mall to zengqi;
+GRANT
+'''
 
 
 # Request在路径操作中声明一个参数，该参数将返回模板。
@@ -29,6 +40,7 @@ async def unicorn_exception_handler(request: Request, exc: BaseError):
         status_code=200,
         content={"message": exc.message, "code": exc.code},
     )
+
 
 if __name__ == '__main__':
     u.run(app, host="127.0.0.1", port=8000)
