@@ -18,6 +18,10 @@ class UmsMenu(Base):
     sort = Column("sort", SMALLINT, nullable=False)
 
 
+class UmsMenuNode(UmsMenu):
+    children: list  # 子级菜单
+
+
 class UmsRoleMenuRelation(Base):
     __tablename__ = "ums_role_menu_relation"
     id = Column("id", Integer, primary_key=True, nullable=False)

@@ -38,3 +38,23 @@ class UmsRoleResourceRelation(Base):
     id = Column("id", Integer, primary_key=True, nullable=False)
     role_id = Column("role_id", Integer, nullable=False)
     resource_id = Column("resource_id", Integer, nullable=False)
+
+
+class UmsResourceCategory(Base):
+    '''
+    private Long id;
+
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
+
+    @ApiModelProperty(value = "分类名称")
+    private String name;
+
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
+    '''
+    __tablename__ = "ums_resource_category"
+    id = Column("id", Integer, primary_key=True, nullable=False)
+    create_time = Column("create_time", DateTime, default=datetime.now(), nullable=False, comment='创建时间')
+    name = Column("name", String, nullable=False, comment='分类名称')
+    sort = Column("sort", Integer, nullable=False, comment='排序')

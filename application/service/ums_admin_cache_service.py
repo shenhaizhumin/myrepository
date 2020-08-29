@@ -45,3 +45,18 @@ class UmsAdminCacheService(object):
         if username:
             key = '{}:{}:{}'.format(redis_database, redis_admin, username)
             redis_service.delete(key)
+
+    # @classmethod
+    # def delete_admin_by_id(cls, user_id):
+    #     if user_id:
+    #         ums_admin=db
+    #         key = '{}:{}:{}'.format(redis_database, redis_admin, username)
+    #         redis_service.delete(key)
+
+    @classmethod
+    def del_resource_list_by_role(cls, role_id):
+        pass
+
+    @classmethod
+    def del_resource_list_by_role_ids(cls, role_ids):
+        pass

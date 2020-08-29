@@ -231,20 +231,14 @@ class UmsAdminService(object):
         user = db.query(UmsAdmin).filter_by(id=user_id).first()
         if not user:
             raise BaseError(msg='修改的用户不存在！')
-        # if user_info.password:
-        #     pwd = generate_hash_password(user_info.password)
-        #     user.password = pwd
-        if user_info.nick_name:
-            user.nick_name = user_info.nick_name
-        if user_info.icon:
-            user.icon = user_info.icon
-        if user_info.email:
-            user.email = user_info.email
-        if user_info.status == 0 or user_info.status:
-            user.status = user_info.status
-        admin_cache_service.delete_admin(username=user.username)
+        update_args = {k: v for k, v in user_info.dict() if v}
+        if 'password' in update_args.keys():
+            update_args.update({'password': generate_hash_password(update_args['password'])})
+        rows = db.query(UmsAdmin).filter_by(id=user_id).update(update_args)
+        if rows:
+            admin_cache_service.delete_admin(username=user.username)
         db.commit()
-        return True
+        return rows
 
     async def delete(self, db, user_id):
         # 删除指定用户
@@ -256,14 +250,15 @@ class UmsAdminService(object):
 
     async def update_role(self, db: Session, admin_id, roles):
         # 修改用户角色关系
-        count = len(roles)
+        # count = len(roles)
         # 先删除原来的关系
-        db.query(UmsAdminRoleRelation).filter_by(admin_id=admin_id).delete()
+        count = db.query(UmsAdminRoleRelation).filter_by(admin_id=admin_id).delete()
         # 建立新关系
         for r_id in roles:
             db.add(UmsAdminRoleRelation(admin_id=admin_id, role_id=r_id))
         db.commit()
         # TODO admin_cache_service 删除缓存资源列表
+        admin_cache_service.del_resource_list_by_role_ids(roles)
         return count
 
     async def get_role_list(self, db: Session, admin_id: int):
@@ -277,7 +272,8 @@ class UmsAdminService(object):
 
     async def update_permission(self, db: Session, admin_id, permission_ids):
         # 修改用户的+-权限
-
+        # 开启事务
+        db.begin(subtransactions=True)
         # 删除原所有权限关系
         db.query(UmsAdminPermissionRelation).filter_by(admin_id=admin_id).delete()
         # 获取用户所有角色权限

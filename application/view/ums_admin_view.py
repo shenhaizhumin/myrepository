@@ -15,7 +15,7 @@ admin_service = UmsAdminService()
 role_service = UmsRoleService()
 
 
-@ums_admin_router.post('/register', description="用户注册",summary='注册')
+@ums_admin_router.post('/register', description="用户注册", summary='注册')
 async def register(schema: UmsAdminInSchema, db: Session = Depends(get_db)):
     ums_admin = await admin_service.register(db=db, schema=schema)
     if ums_admin:
@@ -24,7 +24,7 @@ async def register(schema: UmsAdminInSchema, db: Session = Depends(get_db)):
         raise BaseError(msg="操作失败！")
 
 
-@ums_admin_router.post(tokenUrl, description='用户登录',summary='登录')
+@ums_admin_router.post(tokenUrl, description='用户登录', summary='登录')
 async def login(schema: UmsAdminLoginSchema, req: Request, db: Session = Depends(get_db)):
     token = await admin_service.login(db=db, username=schema.username, password=schema.password, request=req)
     if not token:
@@ -74,8 +74,8 @@ async def get_item(user_id: int = Path(..., alias='id'), user_data=Depends(verif
 async def update_user(user_info: UmsAdminUpdateSchema, user_id: int = Path(..., alias='id'),
                       user_data=Depends(verify_token),
                       db: Session = Depends(get_db)):
-    await admin_service.update(db=db, user_id=user_id, user_info=user_info)
-    return BaseResponse()
+    rows = await admin_service.update(db=db, user_id=user_id, user_info=user_info)
+    return BaseResponse.success(rows)
 
 
 @ums_admin_router.post('/updatePassword')
@@ -113,8 +113,8 @@ async def update_status(user_id: int = Path(..., alias='id'), status: int = Quer
                         user_data=Depends(verify_token),
                         db: Session = Depends(get_db)):
     ums_admin = UmsAdmin(status=status)
-    await admin_service.update(db=db, user_id=user_id, user_info=ums_admin)
-    return BaseResponse()
+    rows = await admin_service.update(db=db, user_id=user_id, user_info=ums_admin)
+    return BaseResponse.success(rows)
 
 
 @ums_admin_router.post('/role/update', summary='给用户分配角色')

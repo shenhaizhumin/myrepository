@@ -11,9 +11,18 @@ class BaseResponse:
         self.code = code
         if type(data) == list:
             self.data = data
-        elif not data:
-            data = '操作成功！'
-        self.data = data
+        if data:
+            self.data = data
+
+    @classmethod
+    def success(cls, data):
+        return BaseResponse(data=data)
+
+    @classmethod
+    def failed(cls, msg, data=None):
+        # cls.code = -200
+        # cls.message = msg
+        return BaseResponse(data=data, code=-200, msg=msg)
 
 
 class BaseError(HTTPException):
@@ -23,4 +32,27 @@ class BaseError(HTTPException):
         self.code = code
         self.status_code = status_code
 
+
 # class BaseValidationError(ValidationError):
+'''
+private Integer pageNum;
+    private Integer pageSize;
+    private Integer totalPage;
+    private Long total;
+    private List<T> list;
+'''
+
+
+class CommonPage(object):
+    pageNum: int
+    pageSize: int
+    totalPage: int
+    total: int
+    list: list
+
+    def __init__(self, **kwargs):
+        self.list = kwargs.get('list')
+        self.total = kwargs.get('total')
+        self.pageNum = kwargs.get('page_num')
+        self.pageSize = kwargs.get('page_size')
+        self.totalPage = kwargs.get('total_page')

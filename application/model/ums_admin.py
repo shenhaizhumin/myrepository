@@ -120,3 +120,7 @@ class UmsPermission(Base):
     status = Column("status", Integer, nullable=False)
     sort = Column("sort", Integer, nullable=False)
     create_time = Column("create_time", DateTime, default=datetime.now(), nullable=False)
+
+
+class UmsPermissionNode(UmsPermission):
+    children: list  # 子级权限
