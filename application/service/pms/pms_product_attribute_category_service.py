@@ -39,15 +39,18 @@ class PmsProductAttributeCategoryService(object):
         #     'select pac.*,pa.* from pms_product_attribute_category pac '
         #     'left join pms_product_attribute pa on pa.product_attribute_category_id=pac.id and pa.type=1;').fetchall()
         # return db.query(PmsProductAttributeCategory).all()
-        return db.execute(
-            text(
-                #    """
-                # select pac.*,pa.* from pms_product_attribute_category pac left join pms_product_attribute pa on
-                # pac.id=pa.product_attribute_category_id;
-                #    """
-                """
-                select pac.*,list=(select pa.* from pms_product_attribute pa where pac.id=pa.product_attribute_category_id)
-                from pms_product_attribute_category pac;
-                """
-            )
-        ).fetchall()
+        # return db.execute(
+        #     text(
+        #         #    """
+        #         # select pac.*,pa.* from pms_product_attribute_category pac left join pms_product_attribute pa on
+        #         # pac.id=pa.product_attribute_category_id;
+        #         #    """
+        #         """
+        #         SELECT pac.id,pac.name,pa.id as attr_id,pa.name as attr_name FROM pms_product_attribute_category pac
+        #         join pms_product_attribute pa on pa.product_attribute_category_id=pac.id and pa.type=1;
+        #         """
+        #     )
+        # ).fetchall()
+        # return db.query(PmsProductAttributeCategory,PmsProductAttribute).outerjoin(PmsProductAttribute,
+        #                                                   PmsProductAttribute.product_attribute_category_id == PmsProductAttributeCategory.id).all()
+        return db.query(PmsProductAttributeCategory).all()

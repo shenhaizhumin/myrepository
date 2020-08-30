@@ -23,7 +23,10 @@ class PmsProductAttributeCategory(Base):
     name = Column("name", String, nullable=False, comment='分类名称')
     attribute_count = Column("attribute_count", Integer, default=0, nullable=False, comment='属性数量')
     param_count = Column("param_count", Integer, nullable=False, default=0, comment='参数数量')
-    # product_attribute_list = relationship('PmsProductAttribute', lazy='joined')
+    product_attribute_list = relationship('PmsProductAttribute',
+                                          primaryjoin='and_(PmsProductAttributeCategory.id==PmsProductAttribute.product_attribute_category_id,'
+                                                      'PmsProductAttribute.type==1)',
+                                          lazy='joined', backref='category')
 
 
 '''
