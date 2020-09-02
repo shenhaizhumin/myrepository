@@ -67,3 +67,22 @@ for k in conf.options('db.mall'):
     mall_db[k] = conf.get('db.mall', k)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+import logging
+from logging import FileHandler
+
+# logging.basicConfig(filename='../log/app_info.log', level=logging.DEBUG,
+#                     format='[%(asctime)s][pid:%(process)d][tid:%(thread)d][%(filename)s:%(lineno)d] %(levelname)s: %(message)s')
+format_file = '[%(asctime)s][pid:%(process)d][tid:%(thread)d][%(filename)s:%(lineno)d] %(levelname)s: %(message)s'
+logger = logging.getLogger('info_log')
+logger.setLevel(logging.DEBUG)
+file_handler = FileHandler(filename='../log/app_info.log', mode='w')
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter(format_file))
+logger.addHandler(file_handler)
+
+error_logger = logging.getLogger('error_log')
+file_handler = FileHandler(filename='../log/app_error.log', mode='w')
+file_handler.setLevel(logging.ERROR)
+file_handler.setFormatter(logging.Formatter(format_file))
+error_logger.addHandler(file_handler)

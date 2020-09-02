@@ -20,7 +20,7 @@ class PmsBrandService(object):
     @classmethod
     def update_brand(cls, db, brand_id, schema_update):
         # 更新
-        args = {k: v for k, v in schema_update.dict().items() if v}
+        args = {k: v for k, v in schema_update.dict().items() if v or v == 0}
         rows = db.query(PmsBrand).filter_by(id=brand_id).update(args)
         db.commit()
         return rows

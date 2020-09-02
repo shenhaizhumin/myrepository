@@ -35,7 +35,7 @@ class UmsMenuService(object):
         #     value = getattr(schema_update, key)
         #     if value or value == 0:
         #         setattr(ums_menu, key, value)
-        update_args = {k: v for k, v in schema_update.dict().items() if v}
+        update_args = {k: v for k, v in schema_update.dict().items() if v or v == 0}
         rows = db.query(UmsMenu).filter_by(id=menu_id).update(update_args)
         db.commit()
         return rows

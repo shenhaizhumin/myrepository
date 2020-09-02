@@ -84,7 +84,7 @@ class UmsRoleService(object):
     @classmethod
     async def update(cls, db: Session, role_id, schema_update):
         # 修改角色信息
-        update_args = {k: v for k, v in schema_update.dict().items() if v}
+        update_args = {k: v for k, v in schema_update.dict().items() if v or v == 0}
         rows = db.query(UmsRole).filter_by(id=role_id).update(update_args)
         return rows
 

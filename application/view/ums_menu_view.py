@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, Path, Depends
 from application.schema.ums_menu_schema import UmsMenuSchema, UmsMenuUpdateSchema
-from application.authentication.UsernamePasswordAuthenticationToken import verify_token
+# from application.authentication.UsernamePasswordAuthenticationToken import verify_token
 from application.service.ums_menu_service import UmsMenuService
 from application.model import get_db
 from application.api.response import BaseError, BaseResponse
@@ -14,14 +14,14 @@ menu_service = UmsMenuService()
 
 
 @ums_menu_router.post('/create', summary='添加后台菜单')
-async def create_menu(schema: UmsMenuSchema, user_data=Depends(verify_token), db=Depends(get_db)):
+async def create_menu(schema: UmsMenuSchema, db=Depends(get_db)):
     count = await menu_service.create_menu(db, schema)
     return BaseResponse(data=count)
 
 
 @ums_menu_router.post('/update/{id}', summary='修改后台菜单')
 async def update_menu(schema_update: UmsMenuUpdateSchema, menu_id: int = Path(..., alias='id'),
-                      user_data=Depends(verify_token), db=Depends(get_db)):
+                      db=Depends(get_db)):
     count = await menu_service.update_menu(db, menu_id, schema_update)
     if count:
         return BaseResponse.success(count)
@@ -30,13 +30,13 @@ async def update_menu(schema_update: UmsMenuUpdateSchema, menu_id: int = Path(..
 
 
 @ums_menu_router.post('/delete/{id}', summary='根据id删除菜单')
-async def delete_menu(menu_id: int = Path(..., alias='id'), user_data=Depends(verify_token), db=Depends(get_db)):
+async def delete_menu(menu_id: int = Path(..., alias='id'), db=Depends(get_db)):
     count = await menu_service.delete_menu(db, menu_id)
     return BaseResponse.success(count)
 
 
 @ums_menu_router.get('/{id}', summary='根据ID获取菜单详情')
-async def get_menu(*, menu_id: int = Path(..., alias='id'), user_data=Depends(verify_token), db=Depends(get_db)):
+async def get_menu(*, menu_id: int = Path(..., alias='id'), db=Depends(get_db)):
     ums_menu = await menu_service.get_menu_by_id(db, menu_id)
     if ums_menu:
         return BaseResponse(data=ums_menu)
@@ -54,7 +54,7 @@ async def menu_list(*, parent_id: int = Path(..., alias='parentId'),
 
 
 @ums_menu_router.get('/tree/list', summary='树形结构返回所有菜单列表')
-async def tree_list(*, user_data=Depends(verify_token), db=Depends(get_db)):
+async def tree_list(*, db=Depends(get_db)):
     menus_tree = await menu_service.tree_list(db)
     return BaseResponse.success(menus_tree)
 

@@ -8,7 +8,7 @@ class UmsResourceService(object):
         db.commit()
 
     async def update_resource(self, db, resource_id, schema_update):
-        update_args = {k: v for k, v in schema_update.dict().items() if v}
+        update_args = {k: v for k, v in schema_update.dict().items() if v or v == 0}
         rows = db.query(UmsResource).filter_by(id=resource_id).update(update_args)
         return rows
 

@@ -21,10 +21,10 @@ validate_credentials_code = error_code
 admin_cache_service = UmsAdminCacheService()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=tokenUrl)
-credentials_exception = BaseError(
+credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    msg="Could not validate credentials",
-    code=validate_credentials_code,
+    detail="Could not validate credentials",
+    # code=validate_credentials_code,
 )
 
 

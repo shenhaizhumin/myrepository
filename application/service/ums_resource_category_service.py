@@ -22,7 +22,7 @@ class UmsResourceCategoryService(object):
         #     value = getattr(schema_update, key)
         #     if value or value == 0:
         #         setattr(ums_res_category, key, value)
-        update_args = {k: v for k, v in schema_update.dict().items() if v}
+        update_args = {k: v for k, v in schema_update.dict().items() if v or v == 0}
         rows = db.query(UmsResourceCategory).filter_by(id=category_id).update(update_args)
         db.commit()
         return rows

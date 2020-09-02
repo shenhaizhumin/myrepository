@@ -24,7 +24,9 @@ class PmsProductAttributeCategory(Base):
     attribute_count = Column("attribute_count", Integer, default=0, nullable=False, comment='属性数量')
     param_count = Column("param_count", Integer, nullable=False, default=0, comment='参数数量')
     product_attribute_list = relationship('PmsProductAttribute',
-                                          primaryjoin='and_(PmsProductAttributeCategory.id==PmsProductAttribute.product_attribute_category_id,'
+                                          primaryjoin='and_('
+                                                      'PmsProductAttributeCategory.id=='
+                                                      'PmsProductAttribute.product_attribute_category_id,'
                                                       'PmsProductAttribute.type==1)',
                                           lazy='joined', backref='category')
 
@@ -72,7 +74,7 @@ class PmsProductAttribute(Base):
     product_attribute_category_id = Column("product_attribute_category_id",
                                            ForeignKey('pms_product_attribute_category.id'),
                                            primary_key=True, nullable=False)
-    name = Column("name", String, nullable=False, comment='分类名称')
+    name = Column("name", String, nullable=False, comment='属性名称')
     select_type = Column("select_type", SMALLINT, nullable=False, comment='属性选择类型：0->唯一；1->单选；2->多选')
     input_type = Column("input_type", SMALLINT, nullable=False, comment='属性录入方式：0->手工录入；1->从列表中选取')
     input_list = Column("input_list", String, nullable=False, comment='可选值列表，以逗号隔开')
