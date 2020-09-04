@@ -3,9 +3,9 @@ from application.model.pms_product_attribute_category import PmsProductAttribute
 
 class PmsProductAttributeService(object):
 
-
     @classmethod
-    def get_list(cls,db,):
+    def get_list(cls, db, ):
+        pass
 
     @classmethod
     def create(cls, db, schema):

@@ -12,10 +12,11 @@ from application.view.ums_resource_category_view import ums_resource_category_ro
 from application.view.ums_resource_view import ums_resource_router
 from application.view.ums_role_view import ums_role_router
 from application.view.pms.pms_brand_view import pms_brand_router
+from application.view.oss_view import oss_router
 from application.view.pms.pms_product_attribute_category_view import pms_product_attribute_category
 from starlette.responses import StreamingResponse
 from fastapi.exceptions import StarletteHTTPException
-import logging
+from application.settings import logger
 import time
 from application.authentication.UsernamePasswordAuthenticationToken import verify_token
 from application.settings import error_logger
@@ -34,7 +35,8 @@ app.include_router(pms_product_attribute_category, prefix='/productAttribute/cat
                    dependencies=[Depends(verify_token)])
 
 # 后台用户角色管理
-app.include_router(ums_role_router, prefix='/role')
+app.include_router(ums_role_router, prefix='/role', tags=['后台用户角色管理'], dependencies=[Depends(verify_token)])
+app.include_router(oss_router, prefix='/aliyun/oss', tags=['Oss相关操作接口'])
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 #
@@ -50,8 +52,9 @@ postgres=# grant ALL privileges on database mall to zengqi;
 GRANT
 '''
 
-logger = logging.getLogger(__file__)
-logger.setLevel(logging.DEBUG)
+
+# logger = logging.getLogger(__file__)
+# logger.setLevel(logging.DEBUG)
 
 
 # 中间件
@@ -64,9 +67,9 @@ async def log_request_params(request: Request, call_next) -> StreamingResponse:
     logger.info(f"===>path_params:{request.path_params}")
     logger.info(f"===>query_params:{request.query_params}")
     # logger.info(f"===>body:{await request.body()}")
-    # logger.info(f"===>form:{await request.form()}")
     start_time = time.time()
     response = await call_next(request)
+    # logger.info(f"===>form:{await request.form()}")
     logger.info(f"总耗时： {time.time() - start_time}")
     # logger.info(f"+++>{response.render()}")
     logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<")

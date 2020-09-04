@@ -48,7 +48,7 @@ async def get_menu(*, menu_id: int = Path(..., alias='id'), db=Depends(get_db)):
 async def menu_list(*, parent_id: int = Path(..., alias='parentId'),
                     page_num: int = Query(1, alias='pageNum'),
                     page_size: int = Query(5, alias='pageSize'),
-                    user_data=Depends(verify_token), db=Depends(get_db)):
+                    db=Depends(get_db)):
     menus = await menu_service.menu_list(db, parent_id, page_num, page_size)
     return BaseResponse.success(menus)
 
@@ -62,6 +62,6 @@ async def tree_list(*, db=Depends(get_db)):
 @ums_menu_router.post('/updateHidden/{id}', summary='修改菜单显示状态')
 async def update_hidden(menu_id: int = Path(..., alias='id', description='菜单id'),
                         hidden: int = Query(..., description='前端显示状态'),
-                        user_data=Depends(verify_token), db=Depends(get_db)):
+                        db=Depends(get_db)):
     count = await menu_service.update_hidden(db, menu_id, hidden)
     return BaseResponse.success(count)

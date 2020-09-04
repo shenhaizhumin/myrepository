@@ -35,6 +35,14 @@ jwt_conf = dict()
 for k in conf.options("jwt.extras"):
     jwt_conf[k] = conf.get("jwt.extras", k)
 
+
+"""
+    aliyun config
+"""
+oss_conf = dict()
+for k in conf.options("oss_manager"):
+    oss_conf[k] = conf.get("oss_manager", k)
+
 """
 admin 缓存配置
 """
